@@ -3,6 +3,9 @@
  */
 //% weight=100 color=#0fbc11 icon="\u270f" block="font for clock"
 namespace clockFont{
+    let strip = neopixel.create(DigitalPin.P1, 256, NeoPixelMode.RGB);
+    let color:number=neopixel.colors(NeoPixelColors.White);
+
     const font4: number[] =[
         0x7E81817E,  // 0
         0x0041FF01,  // 1
@@ -27,21 +30,81 @@ namespace clockFont{
         0x6E916E,  // 8
         0x72897E   // 9
     ];
-    const dispalyPoint:number[]=[
-        0,4,11,16,23,28
-    ];
-    const colonPoint:number[]=[9,21];
     /**
-     * @param color RGB color
+     * @param c RGB color
      */
-    //% blockId="setColor" block="setColor RGB=%color"
-    export function setColor(color: number): void {
+    //% blockId="setColor" block="setColor RGB%c"
+    export function setColor(c: number): void {
+        color=c;
     }
     /**
      * @param p position
      * @param n number
+     * @param f font
      */
-    //% blockId="display" block="display pos=%p num=%n"
-    export function display(p:number,n:number): void {
+    //% blockId="displayNumber" block="number pos%p num%n font%f"
+    export function displayNumber(p:number,n:number,f:number): void {
+        let font:number;
+        if(f==3) font = font3[n];
+        else font = font4[n];
+        for(let c = p;c < (p + f - 1);c++){
+            for(let j = 0;j < 8; j++){
+                if((c % 2) ==0){
+                    if((font >> (c * 8) + j) && 0x01 == 0x01){
+                        strip.setPixelColor(c * 8 + j, color);
+                    }else{
+                        strip.setPixelColor(c * 8 + j, NeoPixelColors.Black);
+                    }
+                } else{
+                    if ((font >> (c * 8) + j) && 0x01 == 0x01) {
+                        strip.setPixelColor(c * 8 + (7 - j), color);
+                    } else {
+                        strip.setPixelColor(c * 8 + (7 - j), NeoPixelColors.Black);
+                    }
+                }
+            }
+        }
+    }
+    /**
+     * @param p position
+     */
+    //% blockId="displayColon" block="colon pos%p"
+    export function displayColon(p: number): void {
+        strip.setPixelColor(p * 8 + 2,color);
+        strip.setPixelColor(p * 8 + 5, color);
+    }
+    /**
+     * @param p position
+     * @param c number
+     */
+    //% blockId="clearColumn" block="clear pos%p col%c"
+    export function clearColumn(p: number, c: number): void {
+        for(let i = 0;i < c;i++){
+            for(let j = 0;j < 8;j++){
+                strip.setPixelColor((i * 8) + j, NeoPixelColors.Black)
+            }
+        }
+    }
+    /**
+     * @param h hour
+     * @param m minute
+     * @param s second
+     */
+    //% blockId="showClock" block="clock hour%h minute%m second%s"
+    export function showClock(h: number, m: number,s:number): void {
+        if (Math.trunc(h / 10)==0){
+            clearColumn(0,3);
+        }else{
+            displayNumber(0,Math.trunc(h / 10),3);
+        }
+        displayNumber(4,h % 10,4);
+        displayColon(9);
+        displayNumber(11, Math.trunc(m / 10), 4);
+        displayNumber(16, m % 10, 4);
+        displayColon(21);
+        displayNumber(23, Math.trunc(s / 10), 4);
+        displayNumber(28, s % 10, 4);
+
+        strip.show();
     }
 }
