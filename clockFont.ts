@@ -4,7 +4,7 @@
 //% weight=100 color=#0fbc11 icon="\u270f" block="font for clock"
 namespace clockFont{
     let strip = neopixel.create(DigitalPin.P1, 256, NeoPixelMode.RGB);
-    let color:number=neopixel.colors(NeoPixelColors.White);
+    let color:number=NeoPixelColors.White;
 
     const font4: number[] =[
         0x7E81817E,  // 0
@@ -50,13 +50,13 @@ namespace clockFont{
         for(let c = p;c < (p + f - 1);c++){
             for(let j = 0;j < 8; j++){
                 if((c % 2) ==0){
-                    if((font >> (c * 8) + j) && 0x01 == 0x01){
+                    if(((font >> (c * 8) + j) & 0x01) == 0x01){
                         strip.setPixelColor(c * 8 + j, color);
                     }else{
                         strip.setPixelColor(c * 8 + j, NeoPixelColors.Black);
                     }
                 } else{
-                    if ((font >> (c * 8) + j) && 0x01 == 0x01) {
+                    if (((font >> (c * 8) + j) & 0x01) == 0x01) {
                         strip.setPixelColor(c * 8 + (7 - j), color);
                     } else {
                         strip.setPixelColor(c * 8 + (7 - j), NeoPixelColors.Black);
