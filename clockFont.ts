@@ -45,24 +45,26 @@ namespace clockFont{
     //% blockId="displayNumber" block="number pos%p num%n font%f"
     export function displayNumber(p:number,n:number,f:number): void {
         let font:number;
-        if(f==3) font = font3[n];
+        if(f == 3) font = font3[n];
         else font = font4[n];
-        for(let c = p;c < (p + f - 1);c++){
+        let fp = f * 8 - 1;
+        for(let c = p;c < (p + f);c++){
             for(let j = 0;j < 8; j++){
-                if((c % 2) ==0){
-                    if(((font >> (c * 8) + j) & 0x01) == 0x01){
+                if((c % 2) == 0){
+                    if(((font >> (fp - j)) & 0x01) == 0x01){
                         strip.setPixelColor(c * 8 + j, color);
                     }else{
                         strip.setPixelColor(c * 8 + j, NeoPixelColors.Black);
                     }
                 } else{
-                    if (((font >> (c * 8) + j) & 0x01) == 0x01) {
+                    if (((font >> (fp - j)) & 0x01) == 0x01) {
                         strip.setPixelColor(c * 8 + (7 - j), color);
                     } else {
                         strip.setPixelColor(c * 8 + (7 - j), NeoPixelColors.Black);
                     }
                 }
             }
+            fp -= 8;
         }
     }
     /**
